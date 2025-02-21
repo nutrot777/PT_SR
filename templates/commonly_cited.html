@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bibliographic Coupling Analysis</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: Arial, sans-serif;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 2.5rem;
+            color: #2c3e50;
+            margin: 20px 0;
+        }
+
+        .section-header {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #2c3e50;
+            margin: 30px 0 10px;
+        }
+
+        .animated-arrow {
+            text-align: center;
+            margin: 20px 0;
+            font-size: 2rem;
+            color: #007bff;
+            animation: bounce 1s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        .modal-header {
+            background-color: #007bff;
+            color: white;
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+        }
+
+        .keyword-tag {
+            display: inline-block;
+            background-color: #f1f1f1;
+            padding: 5px 10px;
+            margin: 5px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            color: #333;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .keyword-tag:hover {
+            background-color: #007bff;
+            color: white;
+        }
+
+        /* Commonly Cited Section */
+        .commonly-cited-cards {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: center;
+        }
+
+        .card {
+            width: 300px;
+            border: none;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .card-title {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        /* Top 80% Section */
+        .top-80-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .top-80-card {
+            padding: 10px 15px;
+            background-color: #e9ecef;
+            color: #333;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .top-80-card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+            background-color: #d6d8db;
+        }
+
+        .chart-container {
+            text-align: center;
+            margin: 30px 0;
+        }
+
+        .chart-container img {
+            max-width: 90%;
+            height: auto;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-home {
+            display: block;
+            width: fit-content;
+            margin: 20px auto;
+            padding: 10px 20px;
+            font-size: 1rem;
+            font-weight: bold;
+            color: white;
+            background-color: #007bff;
+            border: none;
+            border-radius: 8px;
+            text-align: center;
+            transition: background-color 0.2s ease;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Bibliographic Coupling Analysis</h1>
+        <p class="text-center text-muted">Explore commonly cited publications, identify the top 80% highly cited papers, and visualize the coupling analysis.</p>
+
+        <!-- Section: Commonly Cited Papers -->
+        <h2 class="section-header">1. Commonly Cited Papers</h2>
+        <div class="commonly-cited-cards">
+            {% for segment in commonly_cited %}
+            <div class="card p-3">
+                <h5 class="card-title">{{ segment['Segments'] }}</h5>
+                <p class="card-text">Explore commonly cited publications in this segment.</p>
+                <button
+                    class="btn btn-primary"
+                    data-bs-toggle="modal"
+                    data-bs-target="#segmentModal{{ loop.index }}"
+                >
+                    View Commonly Cited Publications within Keywords
+                </button>
+            </div>
+
+            <!-- Modal -->
+            <div class="modal fade" id="segmentModal{{ loop.index }}" tabindex="-1" aria-labelledby="segmentModalLabel{{ loop.index }}" aria-hidden="true">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="segmentModalLabel{{ loop.index }}">{{ segment['Segments'] }}</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            {% for keyword, citations in segment['KeywordDetails'].items() %}
+                            <div class="mb-4">
+                                <h6><strong>{{ keyword }}</strong></h6>
+                                <div>
+                                    {% for citation in citations %}
+                                    <div class="keyword-tag">
+                                        <a href="https://doi.org/{{ citation['DOI'] }}" target="_blank">{{ citation['In_Text_Citation'] }}</a>
+                                        <small>- {{ citation['Title'] }}</small>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Transition Animation -->
+        <div class="animated-arrow">⬇️</div>
+
+        <!-- Section: Top 80% Papers -->
+        <h2 class="section-header">2. Top 80% Commonly Cited Papers</h2>
+        <div class="top-80-container">
+            {% for paper in top_cited %}
+            <a href="https://doi.org/{{ paper['DOI'] }}" target="_blank" class="top-80-card">
+                {{ paper['In_Text_Citation'] }}
+            </a>
+            {% endfor %}
+        </div>
+
+        <!-- Transition Animation -->
+        <div class="animated-arrow">⬇️</div>
+
+        <!-- Section: Visualizations -->
+        <h2 class="section-header">3. Visualizations</h2>
+        <div class="chart-container">
+            
+            <img src="{{ url_for('static', filename='dominant_distribution.png') }}" alt="Dominant Distribution Chart">
+            <h5>Network Distribution of Dominant Publications</h5>
+        </div>
+        <div class="chart-container">
+            
+            <img src="{{ url_for('static', filename='dendrogram_chart.png') }}" alt="Dendrogram Chart">
+            <h5>Segments, Keywords, and Commonly Cited Papers - Dendrogram Chart</h5>
+        </div>
+        <a href="/" class="btn-home">Back to Home</a>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

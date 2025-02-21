@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Key Focus Expanciation</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: Arial, sans-serif;
+        }
+
+        h1 {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #343a40;
+        }
+
+        p.instructions {
+            font-size: 1rem;
+            color: #6c757d;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .segment-title {
+            font-size: 1.25rem;
+            font-weight: bold;
+            color: #495057;
+            padding: 5px 0;
+        }
+
+        .accordion-button {
+            background-color: #f8f9fa;
+            color: #007bff;
+            font-size: 1.1rem;
+            font-weight: 500;
+            border: none;
+            box-shadow: none;
+            transition: all 0.3s ease;
+        }
+
+        .accordion-button:hover {
+            color: #0056b3;
+        }
+
+        .accordion-button:focus {
+            box-shadow: none;
+            outline: none;
+        }
+
+        .accordion-item {
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            overflow: hidden;
+        }
+
+        .accordion-body {
+            background-color: #ffffff;
+            border-top: 1px solid #e9ecef;
+        }
+
+        .keyword-card {
+            display: inline-block;
+            margin: 8px;
+            padding: 8px 12px;
+            background-color: #ffffff;
+            border-radius: 6px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            font-size: 0.85rem;
+            color: #495057;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+
+        .keyword-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        .keyword-grid {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .btn-home {
+            display: block;
+            width: fit-content;
+            margin: 20px auto;
+            padding: 10px 20px;
+            font-size: 1rem;
+            font-weight: bold;
+            color: white;
+            background-color: #007bff;
+            border: none;
+            border-radius: 8px;
+            text-align: center;
+            transition: background-color 0.2s ease;
+            text-decoration: none;
+        }
+
+        .note {
+            display: inline-block;
+            background-color: #ffffff;
+            font-size: 0.68rem;
+            color: #495057;
+            text-align: center;
+            align-content: center;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <div class="container my-4">
+        <h1 class="text-center">Key Focus Expanciation</h1>
+        <p class="instructions">
+            Explore the expanded key focus terms across various research segments. 
+            Each segment highlights key terms derived from studies to provide a deeper understanding.
+            Click on a segment to collapse it, or leave it open for easier exploration.
+        </p>
+
+        <div class="accordion" id="keyFocusAccordion">
+            {% for segment in segments %}
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="heading{{ loop.index }}">
+                    <button
+                        class="accordion-button"
+                        type="button"
+                        data-bs-toggle="collapse"
+                        data-bs-target="#collapse{{ loop.index }}"
+                        aria-expanded="true"
+                        aria-controls="collapse{{ loop.index }}"
+                    >
+                        <span class="segment-title">{{ segment["Segment"] }}</span>
+                    </button>
+                </h2>
+                <div
+                    id="collapse{{ loop.index }}"
+                    class="accordion-collapse collapse show"
+                    aria-labelledby="heading{{ loop.index }}"
+                >
+                    <div class="accordion-body">
+                        <div class="keyword-grid">
+                            {% for keyword in segment["Keywords"] %}
+                            <div class="keyword-card">{{ keyword }}</div>
+                            {% endfor %}
+                            
+                        </div>
+                            <p class="note">Authors' generated <b>key focus</b> based on definition of the PPT Construct.</p>
+                            <p class="note">Click on key focus for other contextual related synonyms used for the classification</p>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <a href="/selected-papers" class="btn-home">Back to Selected Papers</a>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

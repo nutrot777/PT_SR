@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ title if title else "My App" }}</title>
+    <style>
+        /* Loader Styling */
+        .loader {
+            --color: #a5a5b0;
+            --size: 70px;
+            width: var(--size);
+            height: var(--size);
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 5px;
+            position: relative; /* Position relative to allow centering the text below */
+            margin: 0 auto;
+        }
+
+        .loader span {
+            width: 100%;
+            height: 100%;
+            background-color: var(--color);
+            animation: keyframes-blink 0.6s alternate infinite linear;
+        }
+
+        .loader span:nth-child(1) { animation-delay: 0ms; }
+        .loader span:nth-child(2) { animation-delay: 200ms; }
+        .loader span:nth-child(3) { animation-delay: 300ms; }
+        .loader span:nth-child(4) { animation-delay: 400ms; }
+        .loader span:nth-child(5) { animation-delay: 500ms; }
+        .loader span:nth-child(6) { animation-delay: 600ms; }
+
+        @keyframes keyframes-blink {
+            0% {
+                opacity: 0.3;
+                transform: scale(0.5) rotate(5deg);
+            }
+            50% {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        /* Loader container with text */
+        #loader-container {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            z-index: 9999;
+            display: block; /* Loader is visible by default */
+        }
+
+        #loader-text {
+            margin-top: 20px; /* Adds space below the loader */
+            font-family: Arial, sans-serif;
+            font-size: 16px;
+            color: #555; /* Subtle color for elegance */
+        }
+
+        /* Hide content until fully loaded */
+        #content {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <!-- Loader -->
+    <div id="loader-container">
+        <div class="loader">
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+        <div id="loader-text">Server takes a while...</div>
+    </div>
+
+    <!-- Main Content -->
+    <div id="content">
+        {% block content %}{% endblock %}
+    </div>
+
+    <!-- JavaScript for Loader -->
+    <script>
+        // Function to show the loader
+        function showLoader() {
+            const loader = document.getElementById("loader-container");
+            const content = document.getElementById("content");
+    
+            if (loader && content) {
+                loader.style.display = "block";
+                content.style.display = "none"; // Ensure content is hidden
+            }
+        }
+    
+        // Function to hide the loader
+        function hideLoader() {
+            const loader = document.getElementById("loader-container");
+            const content = document.getElementById("content");
+    
+            if (loader && content) {
+                loader.style.display = "none";
+                content.style.display = "block"; // Show content after hiding the loader
+            }
+        }
+    
+        // Ensure the loader behaves properly with browser navigation
+        window.addEventListener("pageshow", function(event) {
+            if (event.persisted) {
+                // Page was loaded from cache, hide the loader immediately
+                hideLoader();
+            }
+        });
+    
+        // Add event listeners for navigation
+        document.addEventListener("DOMContentLoaded", function () {
+            // Show the loader when links are clicked
+            document.querySelectorAll("a").forEach(link => {
+                link.addEventListener("click", function () {
+                    showLoader();
+                });
+            });
+    
+            // Show the loader when forms are submitted
+            document.querySelectorAll("form").forEach(form => {
+                form.addEventListener("submit", function () {
+                    showLoader();
+                });
+            });
+    
+            // Show the loader for browser reloads and navigations
+            window.addEventListener("beforeunload", function () {
+                showLoader();
+            });
+        });
+    
+        // Hide the loader once the page is fully loaded
+        window.addEventListener("load", hideLoader);
+    </script>
+    
+</body>
+</html>

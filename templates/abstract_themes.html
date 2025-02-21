@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Abstract's Extracted Themes</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <style>
+        body {
+            background-color: #f9fafb;
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 40px auto;
+        }
+
+        .page-title {
+            font-size: 2.2rem;
+            font-weight: bold;
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .accordion-button {
+            font-size: 1.1rem;
+            font-weight: bold;
+        }
+
+        .accordion-body {
+            font-size: 0.95rem;
+        }
+
+        .ref-link {
+            color: #007bff;
+            font-weight: bold;
+            font-size: 1.2rem;
+            text-decoration: none;
+        }
+
+        .ref-link {
+            display: block; /* Ensure the Reference_no is on its own line */
+            color: #007bff;
+            font-weight: bold;
+            font-size: 1.2rem;
+            text-decoration: none;
+            margin-bottom: 5px; /* Add spacing between the Reference_no and Title */
+        }
+
+        .paper-title {
+            font-size: 1rem;
+            color: #555;
+            margin-top: 5px;
+            font-weight: normal;
+            display: block; /* Ensure the Title is on its own line */
+        }
+
+
+        .badge-theme {
+            background-color: #007bff;
+            color: white;
+            margin-right: 5px;
+            font-size: 0.85rem;
+            display: inline-block;
+            margin-bottom: 5px;
+        }
+
+        .no-themes {
+            color: #6c757d;
+            font-style: italic;
+        }
+
+        .pagination {
+            justify-content: center;
+            margin: 20px 0;
+        }
+
+        hr {
+            border-top: 1px solid #dee2e6;
+            margin: 10px 0;
+        }
+        .btn-home {
+            display: block;
+            width: fit-content;
+            margin: 20px auto;
+            padding: 10px 20px;
+            font-size: 1rem;
+            font-weight: bold;
+            color: white;
+            background-color: #007bff;
+            border: none;
+            border-radius: 8px;
+            text-align: center;
+            transition: background-color 0.2s ease;
+            text-decoration: none;
+        }
+        p.instructions {
+            font-size: 1rem;
+            color: #6c757d;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="page-title">Abstract's Extracted Themes</h1>
+        <p class="instructions"><a href="https://heeya-stupidbutstudying.tistory.com/entry/DL-keyword-extraction-with-KeyBERT-%EA%B0%9C%EC%9A%94%EC%99%80-%EC%95%8C%EA%B3%A0%EB%A6%AC%EC%A6%98-1">Image used as well as an overview of Keybert Algorithm can be found from this <u>blog</u>.</a></p>
+
+        <!-- Top Pagination -->
+        <nav class="pagination pagination-top" aria-label="Page navigation example">
+            <ul class="pagination">
+                <li class="page-item"><a class="page-link" href="?page=1">1</a></li>
+                <li class="page-item"><a class="page-link" href="?page=2">2</a></li>
+                <li class="page-item"><a class="page-link" href="?page=3">3</a></li>
+            </ul>
+        </nav>
+
+        <a href="/selected-papers" class="btn-home">Back to Selected Papers</a>
+        <!-- Accordion for Themes -->
+        <div class="accordion" id="themeAccordion">
+            {% for paper in papers %}
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="heading{{ paper['Reference_no'] }}">
+                    <button
+                        class="accordion-button collapsed"
+                        type="button"
+                        data-bs-toggle="collapse"
+                        data-bs-target="#collapse{{ paper['Reference_no'] }}"
+                        aria-expanded="false"
+                        aria-controls="collapse{{ paper['Reference_no'] }}"
+                    >
+                        <div>
+                            <a
+                                href="{{ paper['URL'] }}"
+                                target="_blank"
+                                class="ref-link"
+                                onclick="event.stopPropagation();"
+                            >
+                                {{ paper['Reference_no'] }}
+                            </a>
+                            <p class="paper-title mb-0">{{ paper['Title'] }}</p>
+                        </div>
+                    </button>
+                </h2>
+                              
+                <div id="collapse{{ paper['Reference_no'] }}" class="accordion-collapse collapse" aria-labelledby="heading{{ paper['Reference_no'] }}" data-bs-parent="#themeAccordion">
+                    <div class="accordion-body">
+                        <strong>Abstract:</strong>
+                        <p>{{ paper['Abstract'] or 'No abstract available.' }}</p>
+                        <strong>KeyBert Extracted Themes:</strong>
+                        <p>
+                            {% if paper['Has_Themes'] %}
+                                {% for theme in paper['Extracted Themes'].split(',') %}
+                                <span class="badge badge-theme">{{ theme.strip() }}</span>
+                                {% endfor %}
+                            {% else %}
+                                <span class="no-themes">No themes available.</span>
+                            {% endif %}
+                        </p>
+                    </div>
+                </div>
+                <hr>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Bottom Pagination -->
+        <nav class="pagination pagination-bottom" aria-label="Page navigation example">
+            <ul class="pagination">
+                <li class="page-item"><a class="page-link" href="?page=1">1</a></li>
+                <li class="page-item"><a class="page-link" href="?page=2">2</a></li>
+                <li class="page-item"><a class="page-link" href="?page=3">3</a></li>
+            </ul>
+        </nav>
+
+        <a href="/selected-papers" class="btn-home">Back to Selected Papers</a>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Prevent accordion button clicks from stopping the link
+        document.querySelectorAll('.accordion-button').forEach(button => {
+            button.addEventListener('click', event => {
+                const link = event.target.closest('.accordion-header').querySelector('.ref-link');
+                if (event.target === link || link.contains(event.target)) {
+                    event.stopPropagation(); // Prevent the accordion from toggling if the link is clicked
+                }
+            });
+        });
+    </script>
+
+    
+</body>
+</html>
