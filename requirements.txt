@@ -33,6 +33,7 @@ fake-useragent==1.5.1
 filelock==3.16.1
 fire==0.7.0
 Flask==3.0.3
+gunicorn
 idna==3.10
 imagesize==1.4.1
 importlib_metadata==8.5.0
