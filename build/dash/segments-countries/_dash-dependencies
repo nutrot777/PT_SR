@@ -1,1 +1,0 @@
-[{"output":"..modal.is_open...modal-title.children...details-table.data..","inputs":[{"id":"treemap-chart","property":"clickData"},{"id":"close-modal","property":"n_clicks"}],"state":[{"id":"modal","property":"is_open"}],"clientside_function":null,"prevent_initial_call":false,"long":null,"dynamic_creator":null,"no_output":false}]

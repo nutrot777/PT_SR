@@ -3,15 +3,10 @@ dash-bootstrap-components==1.6.0
 dash-core-components==2.0.0
 dash-html-components==2.0.0
 dash-table==5.0.0
-et_xmlfile==2.0.0
 Flask==3.0.3
 gunicorn
-imagesize==1.4.1
-importlib_metadata==8.5.0
 Jinja2==3.1.4
 jsonify==0.5
-markdown-it-py==3.0.0
-MarkupSafe==3.0.2
 matplotlib==3.9.2
 matplotlib-venn==1.1.1
 numpy
@@ -21,4 +16,4 @@ plotly==5.24.1
 plotly-express==0.4.1
 regex==2024.11.6
 requests==2.32.3
-
+XlsxWriter==3.2.0
