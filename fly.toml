@@ -1,0 +1,17 @@
+app = 'online-charts'
+primary_region = 'lax'
+
+[build]
+
+[http_service]
+  internal_port = 8080  # Ensure your app listens on this port!
+  force_https = true
+  auto_stop_machines = false  # Keep VM always running
+  auto_start_machines = true
+  min_machines_running = 1     # Always keep 1 machine alive
+  processes = ['app']
+
+# Explicit VM configuration for f
+[[vm]]
+  size = "shared-cpu-1x"  # Free tier-compatible
+  memory = "1gb"          # Matches free-tier limits

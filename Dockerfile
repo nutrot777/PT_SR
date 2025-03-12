@@ -1,5 +1,5 @@
 # Base image
-FROM python:3.10
+FROM python:3.10-slim
 
 # Set the working directory
 WORKDIR /app
@@ -8,7 +8,8 @@ WORKDIR /app
 COPY . /app
 
 # Install dependencies
-RUN pip install -r requirements.txt
+RUN pip install --user --no-cache-dir -r requirements.txt
+
 
 # Expose the port for Cloud Run
 EXPOSE 8080
