@@ -17,3 +17,5 @@ plotly-express==0.4.1
 regex==2024.11.6
 requests==2.32.3
 XlsxWriter==3.2.0
+python-docx==1.1.2
+reportlab==4.2.5

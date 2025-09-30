@@ -1,4 +1,4 @@
-from flask import Flask, render_template, url_for, jsonify, request
+from flask import Flask, render_template, url_for, jsonify, request, Response
 from dash_apps import create_continents_dash, create_years_countries_dash, create_segments_countries_dash, create_years_segments_dash, create_years_segments_countries_dash
 import io, os
 import pandas as pd
@@ -297,6 +297,224 @@ def abstract_themes():
         paper["Has_Themes"] = bool(paper["Extracted Themes"].strip())
 
     return render_template('abstract_themes.html', papers=papers)
+
+
+@app.route("/selected-papers/references/all")
+def all_references():
+    """View all references without pagination"""
+    # Load the Excel file
+    file_path = "data/output_with_citations.xlsx"
+    df = pd.read_excel(file_path)
+
+    # Prepare data for rendering
+    references = []
+    for _, row in df.iterrows():
+        citation = row.get("Citations", "Citation unavailable").strip()
+        url = row.get("URL", "").strip()
+        id_num = row.get('Reference_no', "").strip()
+        references.append({"citation": citation, "url": url, "id_num": id_num})
+
+    return render_template("all_references.html", references=references, total_count=len(references))
+
+
+@app.route("/selected-papers/references/download")
+def download_references():
+    """Download all references as a text file"""
+    import io
+    
+    # Load the Excel file
+    file_path = "data/output_with_citations.xlsx"
+    df = pd.read_excel(file_path)
+
+    # Create text content
+    output = io.StringIO()
+    output.write("Selected Papers - Complete Reference List (APA Style)\n")
+    output.write("=" * 60 + "\n\n")
+    
+    for _, row in df.iterrows():
+        citation = row.get("Citations", "Citation unavailable").strip()
+        url = row.get("URL", "").strip()
+        id_num = row.get('Reference_no', "").strip()
+        
+        # Format reference with ID and citation
+        output.write(f"({id_num}) {citation}\n")
+        if url:
+            output.write(f"URL: {url}\n")
+        output.write("\n")
+    
+    output.write(f"\nTotal References: {len(df)}\n")
+    output.write(f"Generated on: {pd.Timestamp.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
+    
+    # Create response
+    response_content = output.getvalue()
+    output.close()
+    
+    response = Response(
+        response_content,
+        mimetype='text/plain',
+        headers={'Content-Disposition': 'attachment; filename=selected_papers_references.txt'}
+    )
+    
+    return response
+
+
+@app.route("/selected-papers/references/download-word")
+def download_references_word():
+    """Download all references as a Word document"""
+    from docx import Document
+    from docx.shared import Inches
+    from docx.enum.text import WD_PARAGRAPH_ALIGNMENT
+    import io
+    
+    # Load the Excel file
+    file_path = "data/output_with_citations.xlsx"
+    df = pd.read_excel(file_path)
+
+    # Create Word document
+    doc = Document()
+    
+    # Add title
+    title = doc.add_heading('Selected Papers - Complete Reference List', 0)
+    title.alignment = WD_PARAGRAPH_ALIGNMENT.CENTER
+    
+    # Add subtitle
+    subtitle = doc.add_heading('APA Style Citations', level=2)
+    subtitle.alignment = WD_PARAGRAPH_ALIGNMENT.CENTER
+    
+    # Add generation info
+    info_para = doc.add_paragraph()
+    info_para.add_run(f'Total References: {len(df)}').bold = True
+    info_para.add_run(f'\nGenerated on: {pd.Timestamp.now().strftime("%Y-%m-%d %H:%M:%S")}')
+    info_para.alignment = WD_PARAGRAPH_ALIGNMENT.CENTER
+    
+    # Add a line break
+    doc.add_paragraph()
+    
+    # Add references
+    for _, row in df.iterrows():
+        citation = row.get("Citations", "Citation unavailable").strip()
+        url = row.get("URL", "").strip()
+        id_num = row.get('Reference_no', "").strip()
+        
+        # Create reference paragraph
+        ref_para = doc.add_paragraph()
+        ref_para.add_run(f'({id_num}) ').bold = True
+        ref_para.add_run(citation)
+        
+        # Add URL if available
+        if url:
+            ref_para.add_run(f'\nURL: {url}').italic = True
+        
+        # Add spacing between references
+        doc.add_paragraph()
+    
+    # Save to memory
+    doc_io = io.BytesIO()
+    doc.save(doc_io)
+    doc_io.seek(0)
+    
+    response = Response(
+        doc_io.getvalue(),
+        mimetype='application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        headers={'Content-Disposition': 'attachment; filename=selected_papers_references.docx'}
+    )
+    
+    return response
+
+
+@app.route("/selected-papers/references/download-pdf")
+def download_references_pdf():
+    """Download all references as a PDF document"""
+    from reportlab.lib.pagesizes import letter, A4
+    from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, PageBreak
+    from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+    from reportlab.lib.units import inch
+    from reportlab.lib.enums import TA_CENTER, TA_JUSTIFY
+    import io
+    
+    # Load the Excel file
+    file_path = "data/output_with_citations.xlsx"
+    df = pd.read_excel(file_path)
+
+    # Create PDF
+    buffer = io.BytesIO()
+    doc = SimpleDocTemplate(buffer, pagesize=A4, rightMargin=72, leftMargin=72, 
+                           topMargin=72, bottomMargin=18)
+    
+    # Get styles
+    styles = getSampleStyleSheet()
+    
+    # Create custom styles
+    title_style = ParagraphStyle(
+        'CustomTitle',
+        parent=styles['Heading1'],
+        fontSize=18,
+        spaceAfter=12,
+        alignment=TA_CENTER
+    )
+    
+    subtitle_style = ParagraphStyle(
+        'CustomSubtitle',
+        parent=styles['Heading2'],
+        fontSize=14,
+        spaceAfter=12,
+        alignment=TA_CENTER
+    )
+    
+    reference_style = ParagraphStyle(
+        'ReferenceStyle',
+        parent=styles['Normal'],
+        fontSize=10,
+        spaceAfter=12,
+        alignment=TA_JUSTIFY,
+        leftIndent=0.25*inch,
+        firstLineIndent=-0.25*inch
+    )
+    
+    info_style = ParagraphStyle(
+        'InfoStyle',
+        parent=styles['Normal'],
+        fontSize=10,
+        alignment=TA_CENTER,
+        spaceAfter=20
+    )
+    
+    # Build content
+    content = []
+    
+    # Add title
+    content.append(Paragraph("Selected Papers - Complete Reference List", title_style))
+    content.append(Paragraph("APA Style Citations", subtitle_style))
+    
+    # Add generation info
+    info_text = f"Total References: {len(df)}<br/>Generated on: {pd.Timestamp.now().strftime('%Y-%m-%d %H:%M:%S')}"
+    content.append(Paragraph(info_text, info_style))
+    content.append(Spacer(1, 12))
+    
+    # Add references
+    for _, row in df.iterrows():
+        citation = row.get("Citations", "Citation unavailable").strip()
+        url = row.get("URL", "").strip()
+        id_num = row.get('Reference_no', "").strip()
+        
+        # Format reference text
+        ref_text = f"<b>({id_num})</b> {citation}"
+        if url:
+            ref_text += f"<br/><i>URL: {url}</i>"
+        
+        content.append(Paragraph(ref_text, reference_style))
+    
+    # Build PDF
+    doc.build(content)
+    buffer.seek(0)
+    
+    response = Response(
+        buffer.getvalue(),
+        mimetype='application/pdf',
+        headers={'Content-Disposition': 'attachment; filename=selected_papers_references.pdf'}
+    )
+    
+    return response
 
 
 # Function to load synonyms from the themes_synonyms.xlsx file
